@@ -399,6 +399,10 @@ img {
   transform: translateY(-1px);
 }
 
+.boton-agregar.agregado {
+  background: var(--verde);
+}
+
 /* Promoción */
 .bloque-promocion {
   margin-top: 2rem;

@@ -35,10 +35,10 @@
             <a class="enlace-navegacion" href="#contacto">Contacto</a>
         </nav>
 
-        <button class="boton-comanda" type="button" data-accion="alternar-comanda" aria-controls="panel-comanda"
+        <button class="boton-pedido" type="button" data-accion="alternar-pedido" aria-controls="panel-pedido"
             aria-expanded="true">
-            TU PEDIDO (<span data-cantidad-comanda>0</span>) ·
-            <span data-total-comanda>$0</span>
+            TU PEDIDO (<span data-cantidad-pedido>0</span>) ·
+            <span data-total-pedido>$0</span>
         </button>
     </header>
 
@@ -60,7 +60,9 @@
             <div class="portada-foto-contenedor">
                 <img class="portada-foto"
                     src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&amp;fit=crop&amp;w=1200&amp;q=85"
-                    alt="Hamburguesa a la parrilla con queso y pan dorado" fetchpriority="high" />
+                    srcset="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&amp;fit=crop&amp;w=720&amp;q=80 720w, https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&amp;fit=crop&amp;w=1200&amp;q=85 1200w, https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&amp;fit=crop&amp;w=1600&amp;q=85 1600w"
+                    sizes="(max-width: 720px) 100vw, 52vw" width="1200" height="800"
+                    alt="Hamburguesa a la parrilla con queso y pan dorado" fetchpriority="high" decoding="async" />
             </div>
         </section>
 
@@ -80,6 +82,9 @@
                         <button class="boton-filtro" type="button" data-filtro="hamburguesas" aria-pressed="false">
                             Burgers al carbón
                         </button>
+                        <button class="boton-filtro" type="button" data-filtro="choripanes" aria-pressed="false">
+                            Choripanes
+                        </button>
                         <button class="boton-filtro" type="button" data-filtro="ahumados" aria-pressed="false">
                             Cortes &amp; costillas
                         </button>
@@ -93,13 +98,16 @@
 
                     <!-- Aquí el css acomoda las tarjetas y les da forma de ficha. -->
                     <div class="lista-productos" id="lista-productos" aria-live="polite">
-                        <!-- El identificador y el precio en pesos enteros ayudan a JavaScript a reconocer cada producto. -->
+                        <!-- El HTML mantiene la información visible; JavaScript la lee para calcular el pedido. -->
                         <article class="tarjeta-producto" data-producto-id="doble-brasa" data-categoria="hamburguesas"
-                            data-nombre="Doble Brasa Burger" data-precio="28000">
+                            data-precio="28000">
                             <div class="foto-producto-contenedor">
                                 <img class="foto-producto"
                                     src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&amp;fit=crop&amp;w=700&amp;q=80"
-                                    alt="Doble hamburguesa con queso a la parrilla" loading="lazy" />
+                                    srcset="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&amp;fit=crop&amp;w=400&amp;q=80 400w, https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&amp;fit=crop&amp;w=700&amp;q=80 700w, https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&amp;fit=crop&amp;w=1000&amp;q=80 1000w"
+                                    sizes="(max-width: 420px) 92vw, (max-width: 720px) 46vw, (max-width: 1050px) 42vw, 22vw"
+                                    width="700" height="500" alt="Doble hamburguesa con queso a la parrilla"
+                                    loading="lazy" decoding="async" />
                                 <span class="etiqueta-producto">8 min en brasa</span>
                             </div>
 
@@ -109,19 +117,21 @@
                                     Carne madurada, queso fundido y salsa de la casa.
                                 </p>
                                 <p class="precio-producto" data-precio-visible>$28.000</p>
-                                <button class="boton-agregar" type="button" data-accion="agregar-a-comanda"
-                                    data-producto-id="doble-brasa">
+                                <button class="boton-agregar" type="button" data-accion="agregar-a-pedido">
                                     Tirar a la parrilla
                                 </button>
                             </div>
                         </article>
 
                         <article class="tarjeta-producto" id="ahumados" data-producto-id="costillas-st-louis"
-                            data-categoria="ahumados" data-nombre="Costillas St. Louis BBQ" data-precio="42000">
+                            data-categoria="ahumados" data-precio="42000">
                             <div class="foto-producto-contenedor">
                                 <img class="foto-producto"
                                     src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&amp;fit=crop&amp;w=700&amp;q=80"
-                                    alt="Costillas BBQ glaseadas y ahumadas" loading="lazy" />
+                                    srcset="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&amp;fit=crop&amp;w=400&amp;q=80 400w, https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&amp;fit=crop&amp;w=700&amp;q=80 700w, https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&amp;fit=crop&amp;w=1000&amp;q=80 1000w"
+                                    sizes="(max-width: 420px) 92vw, (max-width: 720px) 46vw, (max-width: 1050px) 42vw, 22vw"
+                                    width="700" height="500" alt="Costillas BBQ glaseadas y ahumadas"
+                                    loading="lazy" decoding="async" />
                                 <span class="etiqueta-producto">8 min en brasa</span>
                             </div>
 
@@ -131,19 +141,21 @@
                                     Costilla ahumada lentamente con glaseado BBQ.
                                 </p>
                                 <p class="precio-producto" data-precio-visible>$42.000</p>
-                                <button class="boton-agregar" type="button" data-accion="agregar-a-comanda"
-                                    data-producto-id="costillas-st-louis">
+                                <button class="boton-agregar" type="button" data-accion="agregar-a-pedido">
                                     Tirar a la parrilla
                                 </button>
                             </div>
                         </article>
 
                         <article class="tarjeta-producto" data-producto-id="choripan-autor"
-                            data-categoria="hamburguesas" data-nombre="Choripán de Autor" data-precio="22000">
+                            data-categoria="choripanes" data-precio="22000">
                             <div class="foto-producto-contenedor">
                                 <img class="foto-producto"
-                                    src="https://unsplash.com/es/fotos/un-primer-plano-de-un-sandwich-en-una-tabla-de-cortar-VeVfebWpOi8"
-                                    alt="Choripán con chimichurri" loading="lazy" />
+                                    src="https://images.unsplash.com/photo-1705512557389-841efbde54db?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D"
+                                    srcset="https://images.unsplash.com/photo-1705512557389-841efbde54db?auto=format&amp;fit=crop&amp;w=400&amp;q=80 400w, https://images.unsplash.com/photo-1705512557389-841efbde54db?auto=format&amp;fit=crop&amp;w=700&amp;q=80 700w, https://images.unsplash.com/photo-1705512557389-841efbde54db?auto=format&amp;fit=crop&amp;w=1000&amp;q=80 1000w"
+                                    sizes="(max-width: 420px) 92vw, (max-width: 720px) 46vw, (max-width: 1050px) 42vw, 22vw"
+                                    width="700" height="500" alt="Choripán con chimichurri" loading="lazy"
+                                    decoding="async" />
                                 <span class="etiqueta-producto">8 min en brasa</span>
                             </div>
 
@@ -153,19 +165,21 @@
                                     Chorizo artesanal, pan tostado y chimichurri.
                                 </p>
                                 <p class="precio-producto" data-precio-visible>$22.000</p>
-                                <button class="boton-agregar" type="button" data-accion="agregar-a-comanda"
-                                    data-producto-id="choripan-autor">
+                                <button class="boton-agregar" type="button" data-accion="agregar-a-pedido">
                                     Tirar a la parrilla
                                 </button>
                             </div>
                         </article>
 
                         <article class="tarjeta-producto" data-producto-id="papas-rusticas"
-                            data-categoria="acompanamientos" data-nombre="Papas Rústicas" data-precio="12000">
+                            data-categoria="acompanamientos" data-precio="12000">
                             <div class="foto-producto-contenedor">
                                 <img class="foto-producto"
                                     src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&amp;fit=crop&amp;w=700&amp;q=80"
-                                    alt="Papas rústicas doradas" loading="lazy" />
+                                    srcset="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&amp;fit=crop&amp;w=400&amp;q=80 400w, https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&amp;fit=crop&amp;w=700&amp;q=80 700w, https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&amp;fit=crop&amp;w=1000&amp;q=80 1000w"
+                                    sizes="(max-width: 420px) 92vw, (max-width: 720px) 46vw, (max-width: 1050px) 42vw, 22vw"
+                                    width="700" height="500" alt="Papas rústicas doradas" loading="lazy"
+                                    decoding="async" />
                                 <span class="etiqueta-producto">Para compartir</span>
                             </div>
 
@@ -175,19 +189,21 @@
                                     Papas doradas con especias de la casa.
                                 </p>
                                 <p class="precio-producto" data-precio-visible>$12.000</p>
-                                <button class="boton-agregar" type="button" data-accion="agregar-a-comanda"
-                                    data-producto-id="papas-rusticas">
+                                <button class="boton-agregar" type="button" data-accion="agregar-a-pedido">
                                     Tirar a la parrilla
                                 </button>
                             </div>
                         </article>
 
                         <article class="tarjeta-producto" data-producto-id="limonada-casa" data-categoria="bebidas"
-                            data-nombre="Limonada de la Casa" data-precio="9000">
+                            data-precio="9000">
                             <div class="foto-producto-contenedor">
                                 <img class="foto-producto"
-                                    src="https://unsplash.com/es/fotos/rodajas-de-limon-junto-a-dos-vasos-transparentes-_PaXoN4_2s0"
-                                    alt="Bebida cítrica fría con hielo" loading="lazy" />
+                                    src="https://images.unsplash.com/photo-1523677011781-c91d1bbe2f9e?q=80&w=393&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D"
+                                    srcset="https://images.unsplash.com/photo-1523677011781-c91d1bbe2f9e?auto=format&amp;fit=crop&amp;w=400&amp;q=80 400w, https://images.unsplash.com/photo-1523677011781-c91d1bbe2f9e?auto=format&amp;fit=crop&amp;w=700&amp;q=80 700w, https://images.unsplash.com/photo-1523677011781-c91d1bbe2f9e?auto=format&amp;fit=crop&amp;w=1000&amp;q=80 1000w"
+                                    sizes="(max-width: 420px) 92vw, (max-width: 720px) 46vw, (max-width: 1050px) 42vw, 22vw"
+                                    width="700" height="500" alt="Bebida cítrica fría con hielo" loading="lazy"
+                                    decoding="async" />
                                 <span class="etiqueta-producto">Bien fría</span>
                             </div>
 
@@ -197,8 +213,7 @@
                                     Limón natural, hielo y un toque de hierbabuena.
                                 </p>
                                 <p class="precio-producto" data-precio-visible>$9.000</p>
-                                <button class="boton-agregar" type="button" data-accion="agregar-a-comanda"
-                                    data-producto-id="limonada-casa">
+                                <button class="boton-agregar" type="button" data-accion="agregar-a-pedido">
                                     Agregar bebida
                                 </button>
                             </div>
@@ -209,49 +224,44 @@
                 <section class="bloque-promocion" id="promos" aria-labelledby="titulo-promocion">
                     <p class="texto-guia">Un extra para tu pedido</p>
                     <h2 id="titulo-promocion">La brasa sabe mejor en combo.</h2>
-                    <p>Arma tu pedido y revisa aquí las promociones disponibles.</p>
+                    <p>Promoción académica: chimichurri gratis con cualquier pedido.</p>
                 </section>
             </div>
 
             <!-- Aquí el css pone el pedido junto al menú; en celular puede abrirse como panel. -->
-            <aside class="panel-comanda" id="panel-comanda" aria-labelledby="titulo-comanda">
-                <div class="barra-comanda">
-                    <span class="titulo-panel-comanda">Tu pedido</span>
-                    <button class="boton-cerrar-comanda" type="button" data-accion="alternar-comanda"
-                        aria-label="Cerrar pedido" aria-controls="panel-comanda">
+            <aside class="panel-pedido" id="panel-pedido" aria-labelledby="titulo-pedido">
+                <div class="barra-pedido">
+                    <span class="titulo-panel-pedido">Tu pedido</span>
+                    <button class="boton-cerrar-pedido" type="button" data-accion="alternar-pedido"
+                        aria-label="Cerrar pedido" aria-controls="panel-pedido">
                         ×
                     </button>
                 </div>
 
                 <div class="factura">
                     <header class="encabezado-factura">
-                        <h2 class="titulo-factura" id="titulo-comanda">
-                            PEDIDO <span data-numero-comanda>#FG-204</span>
+                        <h2 class="titulo-factura" id="titulo-pedido">
+                            PEDIDO <span data-numero-pedido>#FG-204</span>
                         </h2>
-                        <p class="aviso-comanda">
-                            ¡Ya casi desbloqueas papas rústicas gratis! 🍟
+                        <p class="aviso-pedido">
+                            Chimichurri gratis con tu pedido.
                         </p>
-                        <div class="barra-progreso" role="progressbar" aria-label="Progreso de promoción"
-                            aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                            <span class="progreso-promocion" data-progreso-promocion></span>
-                        </div>
-                        <p class="recompensa-comanda">Chimichurri gratis con tu pedido</p>
                     </header>
 
-                    <!-- Almacenamiento local: guardar {id: cantidad} con la clave fast-grill-comanda-v1 -->
+                    <!-- Almacenamiento local: guardar {id: cantidad} con la clave fast-grill-pedido-v1 -->
                     <!-- Estas filas van en la factura y el script las repetirá -->
-                    <template id="plantilla-fila-comanda">
-                        <li class="fila-comanda" data-fila-comanda>
-                            <div class="datos-en-comanda">
-                                <span class="nombre-en-comanda" data-nombre-producto></span>
-                                <span class="precio-en-comanda" data-precio-producto></span>
+                    <template id="plantilla-fila-pedido">
+                        <li class="fila-pedido" data-fila-pedido>
+                            <div class="datos-en-pedido">
+                                <span class="nombre-en-pedido" data-nombre-producto></span>
+                                <span class="precio-en-pedido" data-precio-producto></span>
                             </div>
                             <div class="controles-cantidad" aria-label="Controles de cantidad">
                                 <button class="boton-cantidad" type="button" data-accion="disminuir"
                                     aria-label="Quitar una unidad">
                                     −
                                 </button>
-                                <output class="cantidad-en-comanda" data-cantidad-producto>1</output>
+                                <output class="cantidad-en-pedido" data-cantidad-producto>1</output>
                                 <button class="boton-cantidad" type="button" data-accion="aumentar"
                                     aria-label="Agregar una unidad">
                                     +
@@ -265,29 +275,29 @@
                     </template>
 
                     <!-- JavaScript agrega aquí las filas y actualiza los totales -->
-                    <ul class="productos-comanda" id="productos-comanda" aria-label="Productos del pedido"
+                    <ul class="productos-pedido" id="productos-pedido" aria-label="Productos del pedido"
                         aria-live="polite">
-                        <li class="comanda-vacia" data-comanda-vacia>
+                        <li class="pedido-vacio" data-pedido-vacio>
                             Tu pedido está vacío. Agrega algo de la brasa.
                         </li>
                     </ul>
 
-                    <div class="totales-comanda">
+                    <div class="totales-pedido">
                         <p class="fila-subtotal">
                             <span>Subtotal</span>
-                            <strong data-subtotal-comanda>$0</strong>
+                            <strong data-subtotal-pedido>$0</strong>
                         </p>
                         <p class="fila-total">
                             <span>Total</span>
-                            <strong data-total-comanda>$0</strong>
+                            <strong data-total-pedido>$0</strong>
                         </p>
                     </div>
 
                     <button class="boton-finalizar" type="button" data-accion="finalizar" disabled>
-                        Finalizar pedido
+                        Simular pedido
                     </button>
-                    <p class="nota-comanda" id="nota-finalizar">
-                        El pedido se conserva en este dispositivo.
+                    <p class="nota-pedido" id="nota-finalizar">
+                        Simulación académica: el pedido no se envía a un sistema externo.
                     </p>
                 </div>
             </aside>

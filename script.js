@@ -3,105 +3,62 @@
 // Lógica principal de la tienda interactiva (script.js)
 //
 // Ciclo de funcionamiento:
-//   Al abrir la página  → cargarComanda() (localStorage) → pintar catálogo y pedido
-//   En cada acción      → actualizar estado → guardarComanda() → volver a pintar
+//   Al abrir la página  → cargarPedido() (localStorage) → pintar catálogo y pedido
+//   En cada acción      → actualizar estado → guardarPedido() → volver a pintar
 
 
 // 1. Constantes y configuración 
-const CLAVE_COMANDA = "fast-grill-comanda-v1";
+const CLAVE_PEDIDO = "fast-grill-pedido-v1";
+const CLAVE_PEDIDO_ANTERIOR = "fast-grill-comanda-v1";
 const CLAVE_FILTRO = "fast-grill-filtro-v1";
-const META_PROMOCION = 60000;
 
-// 2. Catálogo de productos
-const PRODUCTOS = [
-  {
-    id: "doble-brasa",
-    categoria: "hamburguesas",
-    nombre: "Doble Brasa Burger",
-    descripcion: "Carne madurada, queso fundido y salsa de la casa.",
-    precio: 28000,
-    imagen: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=700&q=80",
-    alt: "Doble hamburguesa con queso a la parrilla",
-    etiqueta: "8 min en brasa",
-    textoBoton: "Tirar a la parrilla"
-  },
-  {
-    id: "costillas-st-louis",
-    categoria: "ahumados",
-    nombre: "Costillas St. Louis BBQ",
-    descripcion: "Costilla ahumada lentamente con glaseado BBQ.",
-    precio: 42000,
-    imagen: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=700&q=80",
-    alt: "Costillas BBQ glaseadas y ahumadas",
-    etiqueta: "8 min en brasa",
-    textoBoton: "Tirar a la parrilla",
-    anclaSeccion: "ahumados"
-  },
-  {
-    id: "choripan-autor",
-    categoria: "hamburguesas",
-    nombre: "Choripán de Autor",
-    descripcion: "Chorizo artesanal, pan tostado y chimichurri.",
-    precio: 22000,
-    imagen: "https://images.unsplash.com/photo-1612392062798-2dbaa916af7e?auto=format&fit=crop&w=700&q=80",
-    alt: "Choripán con chimichurri",
-    etiqueta: "8 min en brasa",
-    textoBoton: "Tirar a la parrilla"
-  },
-  {
-    id: "papas-rusticas",
-    categoria: "acompanamientos",
-    nombre: "Papas Rústicas",
-    descripcion: "Papas doradas con especias de la casa.",
-    precio: 12000,
-    imagen: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=700&q=80",
-    alt: "Papas rústicas doradas",
-    etiqueta: "Para compartir",
-    textoBoton: "Tirar a la parrilla"
-  },
-  {
-    id: "limonada-casa",
-    categoria: "bebidas",
-    nombre: "Limonada de la Casa",
-    descripcion: "Limón natural, hielo y un toque de hierbabuena.",
-    precio: 9000,
-    imagen: "https://images.unsplash.com/photo-1513558161293-cdaf765edfd7?auto=format&fit=crop&w=700&q=80",
-    alt: "Bebida cítrica fría con hielo",
-    etiqueta: "Bien fría",
-    textoBoton: "Agregar bebida"
-  }
-];
-
-//  3. Estado de la aplicación 
-// Guardamos { "doble-brasa": 2, "papas-rusticas": 1 } como pide el index.html
-let comanda = {};
+// 2. Estado de la aplicación
+// Se guarda { "doble-brasa": 2, "papas-rusticas": 1 } en el navegador.
+let pedido = {};
 let filtroActual = "todo";
 
-//  4. Referencias a elementos del DOM 
+// 3. Referencias a elementos del DOM
 const contenedorProductos = document.querySelector("#lista-productos");
 const contenedorFiltros = document.querySelector(".filtros-categoria");
 const botonesFiltro = document.querySelectorAll(".boton-filtro");
+const enlaceAhumados = document.querySelector('.enlace-navegacion[href="#ahumados"]');
 
-const panelComanda = document.querySelector("#panel-comanda");
-const botonesAlternarComanda = document.querySelectorAll('[data-accion="alternar-comanda"]');
-const listaProductosComanda = document.querySelector("#productos-comanda");
-const plantillaFilaComanda = document.querySelector("#plantilla-fila-comanda");
+const panelPedido = document.querySelector("#panel-pedido");
+const botonesAlternarPedido = document.querySelectorAll('[data-accion="alternar-pedido"]');
+const listaProductosPedido = document.querySelector("#productos-pedido");
+const plantillaFilaPedido = document.querySelector("#plantilla-fila-pedido");
 
-const contadorComanda = document.querySelector("[data-cantidad-comanda]");
-const subtotalComanda = document.querySelector("[data-subtotal-comanda]");
-const totalesComanda = document.querySelectorAll("[data-total-comanda]");
-
-const barraProgresoContenedor = document.querySelector(".barra-progreso");
-const barraProgresoRelleno = document.querySelector("[data-progreso-promocion]");
-const avisoComanda = document.querySelector(".aviso-comanda");
+const contadorPedido = document.querySelector("[data-cantidad-pedido]");
+const subtotalPedido = document.querySelector("[data-subtotal-pedido]");
+const totalesPedido = document.querySelectorAll("[data-total-pedido]");
 
 const botonFinalizar = document.querySelector('[data-accion="finalizar"]');
 const notaFinalizar = document.querySelector("#nota-finalizar");
-const numeroComanda = document.querySelector("[data-numero-comanda]");
+const numeroPedido = document.querySelector("[data-numero-pedido]");
 const anioActual = document.querySelector("[data-anio-actual]");
 
+// El HTML es la única fuente de datos del catálogo, incluidas sus imágenes.
+const PRODUCTOS = Array.from(
+  contenedorProductos.querySelectorAll(".tarjeta-producto")
+).map((tarjeta) => {
+  const precio = Number(tarjeta.dataset.precio);
+  const precioVisible = tarjeta.querySelector("[data-precio-visible]");
 
-// 5. Funciones de utilidad
+  if (precioVisible) {
+    precioVisible.textContent = formatearPesos(precio);
+  }
+
+  return {
+    id: tarjeta.dataset.productoId,
+    categoria: tarjeta.dataset.categoria,
+    nombre: tarjeta.querySelector(".nombre-producto").textContent.trim(),
+    precio,
+    tarjeta
+  };
+});
+
+
+// 4. Funciones de utilidad
 
 // función que convierte un número a formato de pesos colombianos: 28000 → "$28.000"
 function formatearPesos(valor) {
@@ -115,95 +72,60 @@ function buscarProductoPorId(productoId) {
 
 
 
-// 6. Persistencia con localStorage y sessionStorage
+// 5. Persistencia con localStorage y sessionStorage
 
-// Guarda el objeto comanda en localStorage bajo la clave fast-grill-comanda-v1
-function guardarComanda() {
-  localStorage.setItem(CLAVE_COMANDA, JSON.stringify(comanda));
+// Guarda el objeto pedido en localStorage.
+function guardarPedido() {
+  localStorage.setItem(CLAVE_PEDIDO, JSON.stringify(pedido));
+  localStorage.removeItem(CLAVE_PEDIDO_ANTERIOR);
 }
 
 // Recupera el pedido guardado en localStorage al abrir o recargar la página
-function cargarComanda() {
-  const textoGuardado = localStorage.getItem(CLAVE_COMANDA);
+function cargarPedido() {
+  const textoGuardado = localStorage.getItem(CLAVE_PEDIDO)
+    || localStorage.getItem(CLAVE_PEDIDO_ANTERIOR);
 
   if (!textoGuardado) {
-    comanda = {};
+    pedido = {};
     return;
   }
 
   try {
     const datos = JSON.parse(textoGuardado);
-    if (datos && typeof datos === "object" && !Array.isArray(datos)) {
-      comanda = datos;
-    } else {
-      comanda = {};
+    if (!datos || typeof datos !== "object" || Array.isArray(datos)) {
+      pedido = {};
+      return;
     }
-  } catch (error) {
-    comanda = {};
+
+    pedido = Object.fromEntries(
+      Object.entries(datos).filter(([productoId, cantidad]) =>
+        buscarProductoPorId(productoId)
+        && Number.isSafeInteger(Number(cantidad))
+        && Number(cantidad) > 0
+      ).map(([productoId, cantidad]) => [productoId, Number(cantidad)])
+    );
+  } catch {
+    pedido = {};
   }
 }
 
 // Recuerda la categoría seleccionada en la pestaña actual (sessionStorage)
 function cargarFiltro() {
   const filtroGuardado = sessionStorage.getItem(CLAVE_FILTRO);
-  if (filtroGuardado) {
+  const filtrosValidos = new Set(
+    Array.from(botonesFiltro, (boton) => boton.dataset.filtro)
+  );
+
+  if (filtrosValidos.has(filtroGuardado)) {
     filtroActual = filtroGuardado;
   }
 }
 
 
-// 7. Renderizado dinámico del catálogo de productos
-
-// Construye y pinta las tarjetas en #lista-productos desde el array PRODUCTOS
-function renderizarCatalogo() {
-  if (!contenedorProductos) return;
-
-  contenedorProductos.innerHTML = "";
-
-  const productosFiltrados = PRODUCTOS.filter((producto) => {
-    if (filtroActual === "todo") return true;
-    return producto.categoria === filtroActual;
-  });
-
-  productosFiltrados.forEach((producto) => {
-    const tarjeta = document.createElement("article");
-    tarjeta.className = "tarjeta-producto";
-    if (producto.anclaSeccion) {
-      tarjeta.id = producto.anclaSeccion;
-    }
-
-    tarjeta.dataset.productoId = producto.id;
-    tarjeta.dataset.categoria = producto.categoria;
-    tarjeta.dataset.nombre = producto.nombre;
-    tarjeta.dataset.precio = String(producto.precio);
-
-    tarjeta.innerHTML = `
-      <div class="foto-producto-contenedor">
-        <img
-          class="foto-producto"
-          src="${producto.imagen}"
-          alt="${producto.alt}"
-          loading="lazy"
-        />
-        <span class="etiqueta-producto">${producto.etiqueta}</span>
-      </div>
-
-      <div class="datos-producto">
-        <h3 class="nombre-producto">${producto.nombre}</h3>
-        <p class="descripcion-producto">${producto.descripcion}</p>
-        <p class="precio-producto" data-precio-visible>${formatearPesos(producto.precio)}</p>
-        <button
-          class="boton-agregar"
-          type="button"
-          data-accion="agregar-a-comanda"
-          data-producto-id="${producto.id}"
-        >
-          ${producto.textoBoton}
-        </button>
-      </div>
-    `;
-
-    contenedorProductos.appendChild(tarjeta);
+function actualizarFiltroCatalogo() {
+  PRODUCTOS.forEach((producto) => {
+    producto.tarjeta.hidden = filtroActual !== "todo"
+      && producto.categoria !== filtroActual;
   });
 }
 
@@ -225,20 +147,22 @@ function manejarCambioFiltro(evento) {
   sessionStorage.setItem(CLAVE_FILTRO, filtroActual);
 
   actualizarBotonesFiltro();
-  renderizarCatalogo();
+  actualizarFiltroCatalogo();
 }
 
 
-// 8. Cálculos del carrito de compras (usando .reduce())
+// 7. Cálculos del pedido
 
-// Convierte el objeto comanda en una lista detallada de items con sus datos completos
-function obtenerItemsComanda() {
-  return Object.entries(comanda)
+// Convierte el objeto pedido en una lista detallada de items con sus datos completos
+function obtenerItemsPedido() {
+  return Object.entries(pedido)
     .map(([productoId, cantidad]) => {
       const producto = buscarProductoPorId(productoId);
       if (!producto || cantidad <= 0) return null;
       return {
-        ...producto,
+        id: producto.id,
+        nombre: producto.nombre,
+        precio: producto.precio,
         cantidad: Number(cantidad),
         subtotal: producto.precio * Number(cantidad)
       };
@@ -257,54 +181,54 @@ function calcularMontoTotal(items) {
 }
 
 
-// 9. Pintar el carrito (Comanda) y barra de promoción
+// 8. Pintar el pedido
 
-function mostrarListaComanda(items) {
-  if (!listaProductosComanda) return;
+function mostrarListaPedido(items) {
+  if (!listaProductosPedido || !plantillaFilaPedido) return;
 
-  listaProductosComanda.innerHTML = "";
+  listaProductosPedido.innerHTML = "";
 
   // Si no hay productos, mostramos el mensaje de pedido vacío
   if (items.length === 0) {
     const itemVacio = document.createElement("li");
-    itemVacio.className = "comanda-vacia";
-    itemVacio.setAttribute("data-comanda-vacia", "");
+    itemVacio.className = "pedido-vacio";
+    itemVacio.setAttribute("data-pedido-vacio", "");
     itemVacio.textContent = "Tu pedido está vacío. Agrega algo de la brasa.";
-    listaProductosComanda.appendChild(itemVacio);
+    listaProductosPedido.appendChild(itemVacio);
     return;
   }
 
-  // Por cada producto en la comanda, clonamos el <template id="plantilla-fila-comanda">
+  // Por cada producto del pedido, clonamos la plantilla de fila.
   items.forEach((item) => {
-    const clon = plantillaFilaComanda.content.cloneNode(true);
-    const fila = clon.querySelector("[data-fila-comanda]");
+    const clon = plantillaFilaPedido.content.cloneNode(true);
+    const fila = clon.querySelector("[data-fila-pedido]");
 
     fila.dataset.productoId = item.id;
     clon.querySelector("[data-nombre-producto]").textContent = item.nombre;
     clon.querySelector("[data-precio-producto]").textContent = formatearPesos(item.subtotal);
     clon.querySelector("[data-cantidad-producto]").textContent = String(item.cantidad);
 
-    listaProductosComanda.appendChild(clon);
+    listaProductosPedido.appendChild(clon);
   });
 }
 
-function mostrarTotalesYPromocion(items) {
+function mostrarTotales(items) {
   const cantidadUnidades = calcularCantidadTotal(items);
   const montoTotal = calcularMontoTotal(items);
   const textoTotal = formatearPesos(montoTotal);
 
   // Actualizar contador de unidades en el encabezado
-  if (contadorComanda) {
-    contadorComanda.textContent = String(cantidadUnidades);
+  if (contadorPedido) {
+    contadorPedido.textContent = String(cantidadUnidades);
   }
 
   // Actualizar subtotal
-  if (subtotalComanda) {
-    subtotalComanda.textContent = textoTotal;
+  if (subtotalPedido) {
+    subtotalPedido.textContent = textoTotal;
   }
 
-  // Actualizar todos los lugares donde aparece data-total-comanda (header y factura)
-  totalesComanda.forEach((elementoTotal) => {
+  // Actualizar todos los lugares donde aparece data-total-pedido (header y factura)
+  totalesPedido.forEach((elementoTotal) => {
     elementoTotal.textContent = textoTotal;
   });
 
@@ -312,42 +236,23 @@ function mostrarTotalesYPromocion(items) {
   if (botonFinalizar) {
     botonFinalizar.disabled = cantidadUnidades === 0;
   }
-
-  // Actualizar barra de progreso para la promoción de papas rústicas gratis
-  const porcentaje = Math.min(100, Math.round((montoTotal / META_PROMOCION) * 100));
-
-  if (barraProgresoRelleno) {
-    barraProgresoRelleno.style.width = porcentaje + "%";
-  }
-
-  if (barraProgresoContenedor) {
-    barraProgresoContenedor.setAttribute("aria-valuenow", String(porcentaje));
-  }
-
-  if (avisoComanda) {
-    if (montoTotal === 0) {
-      avisoComanda.textContent = "¡Ya casi desbloqueas papas rústicas gratis! 🍟";
-    } else if (montoTotal < META_PROMOCION) {
-      const faltante = META_PROMOCION - montoTotal;
-      avisoComanda.textContent = `¡Te faltan ${formatearPesos(faltante)} para papas rústicas gratis! 🍟`;
-    } else {
-      avisoComanda.textContent = "¡Desbloqueaste papas rústicas GRATIS en tu pedido! 🍟🔥";
-    }
-  }
 }
 
-// Función orquestadora que sincroniza toda la interfaz de la comanda
+// Sincroniza las filas, los importes y el estado del botón de finalizar.
 function actualizarTodo() {
-  const items = obtenerItemsComanda();
-  mostrarListaComanda(items);
-  mostrarTotalesYPromocion(items);
+  const items = obtenerItemsPedido();
+  mostrarListaPedido(items);
+  mostrarTotales(items);
 }
 
-// 10. Acciones del usuario: Agregar, Modificar, Eliminar y Animar
+// 9. Acciones del usuario: agregar, modificar, quitar y animar
 
 // Animación aplicada con JS 
 function animarElemento(elemento) {
-  if (!elemento || typeof elemento.animate !== "function") return;
+  if (!elemento || typeof elemento.animate !== "function"
+    || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
 
   elemento.animate(
     [
@@ -380,33 +285,34 @@ function darFeedbackBotonAgregar(boton) {
 }
 
 // Agrega una unidad del producto al hacer clic en el catálogo
-function manejarAgregarAComanda(evento) {
-  const boton = evento.target.closest('[data-accion="agregar-a-comanda"]');
+function manejarAgregarAPedido(evento) {
+  const boton = evento.target.closest('[data-accion="agregar-a-pedido"]');
   if (!boton) return;
 
-  const productoId = boton.dataset.productoId;
+  const tarjeta = boton.closest(".tarjeta-producto");
+  const productoId = tarjeta && tarjeta.dataset.productoId;
   if (!productoId || !buscarProductoPorId(productoId)) return;
 
-  comanda[productoId] = (comanda[productoId] || 0) + 1;
+  pedido[productoId] = (pedido[productoId] || 0) + 1;
 
-  guardarComanda();
+  guardarPedido();
   actualizarTodo();
 
   // Animaciones de confirmación
   darFeedbackBotonAgregar(boton);
-  animarElemento(contadorComanda);
+  animarElemento(contadorPedido);
 
   if (notaFinalizar) {
     notaFinalizar.textContent = "El pedido se conserva en este dispositivo.";
   }
 }
 
-// Aumenta, disminuye o elimina un producto desde los botones dentro de la comanda
-function manejarControlesComanda(evento) {
+// Aumenta, disminuye o elimina un producto desde los botones del pedido.
+function manejarControlesPedido(evento) {
   const boton = evento.target.closest("button[data-accion]");
   if (!boton) return;
 
-  const fila = boton.closest("[data-fila-comanda]");
+  const fila = boton.closest("[data-fila-pedido]");
   if (!fila) return;
 
   const productoId = fila.dataset.productoId;
@@ -415,57 +321,62 @@ function manejarControlesComanda(evento) {
   const accion = boton.dataset.accion;
 
   if (accion === "aumentar") {
-    comanda[productoId] = (comanda[productoId] || 0) + 1;
+    pedido[productoId] = (pedido[productoId] || 0) + 1;
   } else if (accion === "disminuir") {
-    comanda[productoId] = (comanda[productoId] || 0) - 1;
-    if (comanda[productoId] <= 0) {
-      delete comanda[productoId];
+    pedido[productoId] = (pedido[productoId] || 0) - 1;
+    if (pedido[productoId] <= 0) {
+      delete pedido[productoId];
     }
   } else if (accion === "quitar") {
-    delete comanda[productoId];
+    delete pedido[productoId];
   } else {
     return;
   }
 
-  guardarComanda();
+  guardarPedido();
   actualizarTodo();
-  animarElemento(contadorComanda);
+  animarElemento(contadorPedido);
 }
 
-// Abre o cierra el panel lateral de la comanda en pantallas móviles o al pulsar el botón
-function alternarPanelComanda() {
-  if (!panelComanda) return;
+// Abre o cierra el panel del pedido.
+function alternarPanelPedido() {
+  if (!panelPedido) return;
 
-  const estaOculto = panelComanda.classList.toggle("comanda-oculta");
+  const estaOculto = panelPedido.classList.toggle("pedido-oculto");
   const expandido = !estaOculto;
+  const zonaTienda = panelPedido.closest(".zona-tienda");
 
-  botonesAlternarComanda.forEach((boton) => {
+  if (zonaTienda) {
+    zonaTienda.classList.toggle("pedido-cerrado", estaOculto);
+  }
+
+  botonesAlternarPedido.forEach((boton) => {
     boton.setAttribute("aria-expanded", String(expandido));
   });
 }
 
-// Procesa el cierre del pedido, limpia el carrito y genera nuevo número de orden
+// Simula la confirmación académica del pedido y limpia el carrito local.
 function finalizarPedido() {
-  const items = obtenerItemsComanda();
+  const items = obtenerItemsPedido();
   if (items.length === 0) return;
 
   const codigoOrden = "#FG-" + Math.floor(100 + Math.random() * 900);
 
-  comanda = {};
-  guardarComanda();
+  pedido = {};
+  guardarPedido();
   actualizarTodo();
 
-  if (numeroComanda) {
-    numeroComanda.textContent = codigoOrden;
+  if (numeroPedido) {
+    numeroPedido.textContent = codigoOrden;
   }
 
   if (notaFinalizar) {
-    notaFinalizar.textContent = `¡Pedido ${codigoOrden} enviado a la brasa! Gracias por tu compra. 🔥`;
+    notaFinalizar.textContent = `Pedido ${codigoOrden} simulado. Esta demo no envía órdenes a un sistema externo.`;
     animarElemento(notaFinalizar);
   }
 }
 
-// 11. Conexiones de eventos (Event Listeners) y Arranque
+// 10. Eventos e inicio
 
 function iniciarTienda() {
   // Actualizar año del footer automáticamente
@@ -474,29 +385,38 @@ function iniciarTienda() {
   }
 
   // 1. Cargar datos persistidos
-  cargarComanda();
+  cargarPedido();
   cargarFiltro();
 
-  // 2. Pintar interfaz inicial
+  // 2. Sincronizar la interfaz inicial con los datos del HTML y el almacenamiento.
   actualizarBotonesFiltro();
-  renderizarCatalogo();
+  actualizarFiltroCatalogo();
   actualizarTodo();
 
   // 3. Escuchadores de eventos (Delegación de eventos)
   if (contenedorProductos) {
-    contenedorProductos.addEventListener("click", manejarAgregarAComanda);
+    contenedorProductos.addEventListener("click", manejarAgregarAPedido);
   }
 
   if (contenedorFiltros) {
     contenedorFiltros.addEventListener("click", manejarCambioFiltro);
   }
 
-  if (listaProductosComanda) {
-    listaProductosComanda.addEventListener("click", manejarControlesComanda);
+  if (enlaceAhumados) {
+    enlaceAhumados.addEventListener("click", () => {
+      filtroActual = "ahumados";
+      sessionStorage.setItem(CLAVE_FILTRO, filtroActual);
+      actualizarBotonesFiltro();
+      actualizarFiltroCatalogo();
+    });
   }
 
-  botonesAlternarComanda.forEach((boton) => {
-    boton.addEventListener("click", alternarPanelComanda);
+  if (listaProductosPedido) {
+    listaProductosPedido.addEventListener("click", manejarControlesPedido);
+  }
+
+  botonesAlternarPedido.forEach((boton) => {
+    boton.addEventListener("click", alternarPanelPedido);
   });
 
   if (botonFinalizar) {

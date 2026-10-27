@@ -2,6 +2,9 @@
 
 Proyecto desarrollado para el **Hackathon 1**.
 
+## 🚀 Despliegue
+Visita la tienda online en vivo: [Fast Grill en GitHub Pages](https://angiefuentes2909.github.io/Fast_Grill/)
+
 ## 🍔 Sobre el Proyecto
 **Fast Grill** es una Landing Page para una tienda online interactiva enfocada en la venta de comida.
 
